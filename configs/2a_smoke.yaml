@@ -1,0 +1,55 @@
+# Phase 2a *smoke* configuration.
+#
+# A minimal end-to-end pipeline check on sMNIST:
+#   1 init, 2 bit-widths, 1 seed, tiny model, 2 epochs, 1000 train samples.
+#
+# Purpose: catch wiring bugs (data shapes, optimizer groups, quantizer
+# install, CSV resume, diagnose_each_epoch) before launching the real
+# 36-cell sCIFAR sweep. NOT a substitute for the headline experiment.
+
+experiment_name: phase2a_smoke
+
+data:
+  name: smnist
+  data_dir: ./data
+  batch_size: 64
+  num_workers: 0           # avoid worker startup overhead for a tiny run
+  val_fraction: 0.1
+  pin_memory: false
+  persistent_workers: false
+  download: true
+  subset_train: 1000       # tiny training subset
+  subset_test: 500
+
+model:
+  d_model: 16
+  d_state: 32
+  n_layers: 2
+  dropout: 0.0
+  conj_sym: true
+  pooling: mean
+
+quant:
+  mode: deterministic
+  per_channel: true
+  headroom: 1.05
+
+training:
+  epochs: 2
+  lr: 4.0e-3
+  ssm_lr_factor: 0.1
+  weight_decay: 0.01
+  warmup_epochs: 1
+  grad_clip: 1.0
+  log_every: 0
+  diagnose_each_epoch: true
+
+sweep:
+  inits: ['fout', 'skew-hippo']
+  bit_widths: [4, null]
+  seeds: [0]
+
+output:
+  output_dir: experiments/runs/phase2a_smoke
+  csv_name: results.csv
+  save_best: false

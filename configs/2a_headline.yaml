@@ -1,0 +1,57 @@
+# Phase 2a headline experiment configuration.
+#
+# Reproduces the (init x bits x seed) sweep specified in goals.md §6.1:
+#   2 inits  x  (5 bit-widths + fp32 reference)  x  3 seeds  =  36 cells.
+#
+# Matches the S4 / LRA convention numbers (sCIFAR, L=1024, N=64, d_model=128,
+# 4 layers, batch_size=50, AdamW lr=4e-3 with 10x lower LR on SSM params and
+# no weight decay there).
+#
+# Run with:
+#   python -m experiments.run_phase2a --config configs/2a_headline.yaml
+
+experiment_name: phase2a_headline
+
+data:
+  name: scifar
+  data_dir: ./data
+  batch_size: 50
+  num_workers: 4
+  val_fraction: 0.1
+  pin_memory: true
+  persistent_workers: true
+  download: true
+
+model:
+  d_model: 128
+  d_state: 64
+  n_layers: 4
+  dropout: 0.1
+  conj_sym: true
+  pooling: mean
+  # `init` is set by the sweep loop (one of 'fout' or 'skew-hippo').
+
+quant:
+  mode: deterministic       # Phase 2a uses deterministic rounding (goals.md §6.1).
+  per_channel: true         # Per-mode scale; see qat/sensitivity.py:_auto_scale_per_mode.
+  headroom: 1.05
+
+training:
+  epochs: 200
+  lr: 4.0e-3
+  ssm_lr_factor: 0.1        # canonical S4 convention: 10x lower LR on A/B/C/log_dt
+  weight_decay: 0.01
+  warmup_epochs: 10
+  grad_clip: 1.0
+  log_every: 0              # per-step printing off; per-epoch line is enough.
+  diagnose_each_epoch: true
+
+sweep:
+  inits: ['fout', 'skew-hippo']
+  bit_widths: [2, 3, 4, 6, 8, null]   # null = fp32 reference
+  seeds: [0, 1, 2]
+
+output:
+  output_dir: experiments/runs/phase2a_headline
+  csv_name: results.csv
+  save_best: false

@@ -1,0 +1,65 @@
+# Phase 2a ablation: frozen log_dt.
+#
+# Tests whether dt drift during training is the mechanism that erodes
+# FouT's Nyquist-aligned conditioning advantage under QAT. We freeze
+# log_dt at its 'nyquist' init (Δ = 2/N per channel + small jitter) and
+# compare the fp32 / 4-bit gap against the headline (unfrozen) numbers:
+#
+#   headline FouT fp32   = 0.7578
+#   headline FouT 4-bit  = 0.7426     (gap = -1.52pp)
+#
+# Outcome map (Newgoals.md §5.3):
+#   frozen gap < 1pp     -> dt drift IS the mechanism. Claim 5 survives.
+#   frozen gap ~= 1.5pp  -> dt drift is NOT the mechanism. Reframe paper.
+#   frozen gap > 1.5pp   -> dt drift was actually helping QAT. Unexpected.
+#
+# Sweep: 1 init * 2 bit-widths * 3 seeds = 6 cells, ~14 GPU-hours on A10.
+#
+# Run with:
+#   python -m experiments.run_phase2a --config configs/2a_ablation_frozen_dt.yaml
+
+experiment_name: phase2a_frozen_dt_ablation
+
+data:
+  name: scifar
+  data_dir: ./data
+  batch_size: 50
+  num_workers: 4
+  val_fraction: 0.1
+  pin_memory: true
+  persistent_workers: true
+  download: true
+
+model:
+  d_model: 128
+  d_state: 64
+  n_layers: 4
+  dropout: 0.1
+  conj_sym: true
+  pooling: mean
+  freeze_log_dt: true          # <- the only meaningful delta vs the headline
+
+quant:
+  mode: deterministic
+  per_channel: true
+  headroom: 1.05
+
+training:
+  epochs: 200
+  lr: 4.0e-3
+  ssm_lr_factor: 0.1           # canonical S4: 10x lower LR on A/B/C/log_dt
+  weight_decay: 0.01
+  warmup_epochs: 10
+  grad_clip: 1.0
+  log_every: 0
+  diagnose_each_epoch: true
+
+sweep:
+  inits: ['fout']              # LegS has no Nyquist alignment to preserve
+  bit_widths: [4, null]        # 4-bit + fp32 (null); seeds match headline
+  seeds: [0, 1, 2]
+
+output:
+  output_dir: experiments/runs/phase2a_frozen_dt
+  csv_name: results.csv
+  save_best: false
