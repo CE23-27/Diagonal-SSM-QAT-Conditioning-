@@ -2,7 +2,7 @@
 
 *Does a 12-order-of-magnitude difference in eigenvector conditioning translate into a 12-order difference in quantization robustness? No — and the way it fails is the result.*
 
-> **Paper:** [On the Conditioning of Diagonal State Space Models Under Quantization-Aware Training](OnTheConditioningOfDiagonalSSMsUnderQAT.pdf)  ·  **Status:** research code accompanying the paper.
+> **Paper:** [On the Conditioning of Diagonal State Space Models Under Quantization-Aware Training](SSMQATConditioning.pdf)  ·  **Status:** research code accompanying the paper.
 
 The project set out to test a clean prediction: that S4D initializations differing by ~12 orders of magnitude in eigenvector conditioning κ(V) — FouT (κ ≈ 14) vs. Skew-HiPPO (κ ≈ 1.3×10¹³) — should differ commensurately in low-bit QAT robustness, with FouT tolerating bit-widths where Skew-HiPPO collapses. **That prediction doesn't hold quantitatively — and what its failure revealed is the actual contribution.**
 
