@@ -2,10 +2,10 @@
 
 *Does a 12-order-of-magnitude difference in eigenvector conditioning translate into a 12-order difference in quantization robustness? No — and the way it fails is the result.*
 
-> **Paper:** [On the Conditioning of Diagonal State Space Models Under Quantization-Aware Training](SSMQATConditioning.pdf)  ·  **Status:** research code accompanying the paper.
+> **Paper:** [On the Conditioning of Diagonal State Space Models Under Quantization-Aware Training](https://raw.githubusercontent.com/CE23-27/Diagonal-SSM-QAT-Conditioning-/main/SSMQATConditioning.pdf)  ·  **Status:** research code accompanying the paper.
 
 <p align="center">
-  <a href="SSMQATConditioning.pdf">
+  <a href="https://raw.githubusercontent.com/CE23-27/Diagonal-SSM-QAT-Conditioning-/main/SSMQATConditioning.pdf">
     <img src="assets/paper-preview.png" alt="First page of the paper — click to open the PDF" width="600">
   </a>
   <br>
