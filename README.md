@@ -4,6 +4,14 @@
 
 > **Paper:** [On the Conditioning of Diagonal State Space Models Under Quantization-Aware Training](SSMQATConditioning.pdf)  ·  **Status:** research code accompanying the paper.
 
+<p align="center">
+  <a href="SSMQATConditioning.pdf">
+    <img src="assets/paper-preview.png" alt="First page of the paper — click to open the PDF" width="600">
+  </a>
+  <br>
+  <em>Click the page to open the full PDF.</em>
+</p>
+
 The project set out to test a clean prediction: that S4D initializations differing by ~12 orders of magnitude in eigenvector conditioning κ(V) — FouT (κ ≈ 14) vs. Skew-HiPPO (κ ≈ 1.3×10¹³) — should differ commensurately in low-bit QAT robustness, with FouT tolerating bit-widths where Skew-HiPPO collapses. **That prediction doesn't hold quantitatively — and what its failure revealed is the actual contribution.**
 
 ---
